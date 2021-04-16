@@ -28,8 +28,8 @@ std::vector<uint8_t> read_file(std::string path)
 		std::istream_iterator<uint8_t>());
 
 	std::cout << "Read " << bytes.size() << " numbers" << std::endl;
-	for (std::vector<uint8_t>::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
-		std::cout << *i << ' ';
+	/*for (std::vector<uint8_t>::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
+		std::cout << *i << ' ';*/
 
 	return bytes;
 }
@@ -44,9 +44,12 @@ std::vector<std::vector<uint8_t>> split_signatures(std::vector<uint8_t> bytes)
 		if (*i == '\n') {
 			++index;
 			signatures.push_back({});
-			std::cout << "Line break found";
+			std::cout << "Line break found" << std::endl;
 		}
-		signatures[index].push_back(*i);
+		if (*i != '\r' && *i != '\n')
+		{
+			signatures[index].push_back(*i);
+		}
 	}
 	return signatures;
 }
@@ -75,9 +78,14 @@ int main(int argc, char* argv[])
 	Trie trie;
 	//for (std::vector<uint8_t>::const_iterator i = signatures_array[0].begin(); i != signatures_array[0].end(); ++i)
 	//	std::cout << *i << ' ';
-	trie.add_pattern(signatures_array[0]);
-	trie.add_pattern(signatures_array[1]);
-	trie.add_pattern(signatures_array[2]);
+
+	std::vector<std::vector<uint8_t>>::iterator it;
+	for (it = signatures_array.begin(); it != signatures_array.end(); it++)
+	{
+		trie.add_pattern(*it);
+	}
+	
+	trie.add_backs();
 	trie.print();
 	
 
