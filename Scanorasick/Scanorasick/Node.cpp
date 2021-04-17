@@ -5,6 +5,7 @@ int Node::count = 0;
 Node::Node(uint8_t value) :
 	m_value(value),
 	m_fail(NULL),
+	m_end(false),
 	m_index(count)
 {
 	count++;
@@ -50,9 +51,24 @@ void Node::set_full_value(std::vector<uint8_t> value)
 	m_full_value = value;
 }
 
+Node* Node::get_fail()
+{
+	return m_fail;
+}
+
 void Node::set_fail(Node *fail)
 {
 	m_fail = fail;
+}
+
+bool Node::is_end()
+{
+	return m_end;
+}
+
+void Node::set_end(bool end)
+{
+	m_end = end;
 }
 
 void Node::print(int i)
@@ -60,9 +76,7 @@ void Node::print(int i)
 	if (m_fail != NULL)
 	{
 		std::cout << "value: " << m_value << ", index: " << m_index << ", fail_index: " << m_fail->m_index << ", full: ";
-		for (std::vector<uint8_t>::const_iterator i = m_full_value.begin(); i != m_full_value.end(); ++i)
-			std::cout << *i;
-		std::cout << std::endl;
+		print_full_value();
 	}
 
 	std::map<uint8_t, Node*>::iterator it;
@@ -70,4 +84,13 @@ void Node::print(int i)
 	{
 		it->second->print(i + 1);
 	}
+}
+
+void Node::print_full_value()
+{
+	for (std::vector<uint8_t>::const_iterator i = m_full_value.begin(); i != m_full_value.end(); ++i)
+	{
+		std::cout << *i;
+	}
+	std::cout << std::endl;
 }

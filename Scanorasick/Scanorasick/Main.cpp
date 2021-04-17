@@ -5,6 +5,8 @@
 #include <iterator>
 
 #include "Trie.h"
+#include "File.h"
+#include "Scanner.h"
 
 enum class Commands : uint8_t
 {
@@ -12,60 +14,25 @@ enum class Commands : uint8_t
 	SCAN
 };
 
-std::vector<uint8_t> read_file(std::string path)
+enum ArgIndex
 {
-	std::ifstream file(path, std::ios::binary);
+	COMMAND = 0,
+	TARGET_FILE,
+	DFA_FILE,
 
-	if (!file.good())
-	{
-		std::cerr << "File does not exist" << std::endl;
-	}
-
-	// Leave new lines in binary mode
-	file.unsetf(std::ios::skipws);
-
-	std::vector<uint8_t> bytes((std::istream_iterator<uint8_t>(file)),
-		std::istream_iterator<uint8_t>());
-
-	std::cout << "Read " << bytes.size() << " numbers" << std::endl;
-	/*for (std::vector<uint8_t>::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
-		std::cout << *i << ' ';*/
-
-	return bytes;
-}
-
-std::vector<std::vector<uint8_t>> split_signatures(std::vector<uint8_t> bytes)
-{
-	std::vector<std::vector<uint8_t>> signatures = { {} };
-	int index = 0;
-
-	for (std::vector<uint8_t>::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
-	{
-		if (*i == '\n') {
-			++index;
-			signatures.push_back({});
-			std::cout << "Line break found" << std::endl;
-		}
-		if (*i != '\r' && *i != '\n')
-		{
-			signatures[index].push_back(*i);
-		}
-	}
-	return signatures;
-}
+	ARGS_COUNT
+};
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Hello" << std::endl;
-
 	// 1. Command from user
 	Commands cmd = Commands::INIT;
 
 	// 2. Signature file
-	std::vector<uint8_t> signatures_buffer = { 'h', 'e', 'r', 'e', '\n', 't', 'h', 'e' };
+	//std::vector<uint8_t> signatures_buffer = { 'h', 'e', 'r', 'e', '\n', 't', 'h', 'e' };
 
 	// 3. Parse(signatures_buffer) -> signatures_array
-	std::vector<std::vector<uint8_t>> signatures_array = { { 'h', 'e', 'r', 'e' }, { 't', 'h', 'e' }, {'h', 'e', 'y' } };
+	//std::vector<std::vector<uint8_t>> signatures_array = { { 'h', 'e', 'r', 'e' }, { 't', 'h', 'e' }, {'h', 'e', 'y' } };
 
 	/*
 		* TODO:
@@ -73,8 +40,11 @@ int main(int argc, char* argv[])
 		*	- Trie class
 		*   - Node class
 	*/
-	signatures_buffer = read_file("C://Users//hadar//Desktop//signaturesFile.txt");
-	signatures_array = split_signatures(signatures_buffer);
+
+	File signatures_file("C://Users//hadar//Desktop//signaturesFile.txt");
+
+	std::vector<uint8_t> signatures_buffer = signatures_file.get_content();
+	std::vector<std::vector<uint8_t>> signatures_array = signatures_file.split_signatures(signatures_buffer);
 	Trie trie;
 	//for (std::vector<uint8_t>::const_iterator i = signatures_array[0].begin(); i != signatures_array[0].end(); ++i)
 	//	std::cout << *i << ' ';
@@ -87,11 +57,16 @@ int main(int argc, char* argv[])
 	
 	trie.add_backs();
 	trie.print();
-	
+
+	File file_to_scan("C://Users//hadar//Desktop//FileToScan.txt");
+	std::vector<uint8_t> content = file_to_scan.read_file(true);
+	Scanner scanner;
+	scanner.scan(content, trie);
 
 	switch (cmd)
 	{
 	case Commands::INIT:
+
 		break;
 
 	case Commands::SCAN:

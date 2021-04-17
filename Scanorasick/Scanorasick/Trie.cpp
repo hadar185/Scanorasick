@@ -3,6 +3,12 @@
 Trie::Trie()
 {
 	m_root = new Node(5);
+	m_root->set_fail(m_root);
+}
+
+Node *Trie::get_root()
+{
+	return m_root;
 }
 
 void Trie::add_pattern(std::vector<uint8_t> pattern)
@@ -19,7 +25,12 @@ void Trie::add_pattern(std::vector<uint8_t> pattern)
         }
 
         current = current->add_next(pattern[0]);
+		current->set_fail(m_root);
         pattern.erase(pattern.begin());
+		if (pattern.size() == 0)
+		{
+			current->set_end(true);
+		}
     }
     
 }

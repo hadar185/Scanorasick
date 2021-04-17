@@ -16,6 +16,7 @@ private:
 public:
 	Trie();
 
+	Node* get_root();
 	void add_pattern(std::vector<uint8_t>);
 	Node *search(std::vector<uint8_t>);
 	void add_backs();
