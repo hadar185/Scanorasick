@@ -59,3 +59,7 @@ std::vector<uint8_t> File::get_content() {
 
 	return m_content;
 }
+
+TrieFile::TrieFile(std::string path) : File::File(path)
+{}
+

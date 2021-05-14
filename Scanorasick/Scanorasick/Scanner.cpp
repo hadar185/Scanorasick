@@ -15,6 +15,36 @@ bool Scanner::scan(
 
 		if (next == NULL)
 		{
+			if (current == current->get_fail())
+			{
+				++i;
+				continue;
+			}
+
+			current = current->get_fail();
+			next = current->get_next(buffer[i]);
+		}
+		else
+		{
+			current = next;
+			++i;
+		}
+
+		if (current->is_end())
+		{
+			current->print_full_value();
+		}
+	}
+
+	return true;
+}
+
+/*while (i < buffer.size() && next != root)
+	{
+		next = current->get_next(buffer[i]);
+
+		if (next == NULL)
+		{
 			if (current != root)
 			{
 				current = current->get_fail();
@@ -24,6 +54,17 @@ bool Scanner::scan(
 				{
 					++i;
 				}
+				else
+				{
+					if (current->is_end())
+					{
+						current->print_full_value();
+					}
+				}
+			}
+			else
+			{
+				++i;
 			}
 			continue;
 		}
@@ -35,6 +76,4 @@ bool Scanner::scan(
 		}
 
 		++i;
-	}
-	return true;
-}
+	}*/
