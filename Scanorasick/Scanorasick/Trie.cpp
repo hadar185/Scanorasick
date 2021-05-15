@@ -1,15 +1,30 @@
 #include "Trie.h"
 
-Trie::Trie()
+Trie::Trie() : m_patterns_amount(0)
 {
-	Node::count = 0;
-	m_root = new Node(5);
+	m_root = new Node(5, m_size);
+	inc_size();
 	m_root->set_fail(m_root);
 }
 
 Node* Trie::get_root()
 {
 	return m_root;
+}
+
+int Trie::get_size()
+{
+	return m_size;
+}
+
+void Trie::inc_size()
+{
+	++m_size;
+}
+
+int Trie::get_patterns_amount()
+{
+	return m_patterns_amount;
 }
 
 void Trie::add_pattern(std::vector<uint8_t> pattern)
@@ -24,14 +39,16 @@ void Trie::add_pattern(std::vector<uint8_t> pattern)
 		}
 		else
 		{
-			current = current->add_next(pattern[0]);
+			current = current->add_next(pattern[0], m_size);
+			inc_size();
 			current->set_fail(m_root);
 		}
 
 		pattern.erase(pattern.begin());
-		if (pattern.size() == 0)
+		if (pattern.size() == 0 && !current->is_end())
 		{
 			current->set_end(true);
+			++m_patterns_amount;
 		}
 	}
 }
@@ -92,7 +109,7 @@ void Trie::print()
 
 NodeStruct *Trie::serialize()
 {
-	NodeStruct *nodes_array = (NodeStruct *)malloc(Node::count * sizeof(NodeStruct));
+	NodeStruct *nodes_array = (NodeStruct *)malloc(m_size * sizeof(NodeStruct));
 	if (!nodes_array)
 	{
 		std::cout << "Memory Allocation Failed";
@@ -138,6 +155,11 @@ void Trie::deserialize(std::vector<NodeStruct> node_structs)
 		{
 			NodeStruct next = node_structs[node_structs[i].next_indexes[j]];
 			nodes[next.index] = nodes[i]->add_next(next, nodes[next.fail_index]);
+			inc_size();
+			if (next.end)
+			{
+				++m_patterns_amount;
+			}
 		}
 	}
 }

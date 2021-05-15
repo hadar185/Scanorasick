@@ -8,5 +8,5 @@
 class Scanner
 {
 public:
-	bool scan(std::vector<uint8_t> buffer, Trie trie);
+	int scan(std::vector<uint8_t> buffer, Trie trie);
 };

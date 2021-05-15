@@ -1,24 +1,18 @@
 #include "Node.h"
 
-int Node::count = 0;
-
-Node::Node(uint8_t value) :
+Node::Node(uint8_t value, int index) :
 	m_value(value),
 	m_fail(NULL),
 	m_end(false),
-	m_index(count)
-{
-	count++;
-}
+	m_index(index)
+{}
 
 Node::Node(NodeStruct node_struct, Node *fail) :
 	m_value(node_struct.value),
 	m_fail(fail),
 	m_end(node_struct.end),
 	m_index(node_struct.index)
-{
-	count++;
-}
+{}
 
 uint8_t Node::get_value()
 {
@@ -40,8 +34,8 @@ Node* Node::get_next(uint8_t value)
 	return it->second;
 }
 
-Node* Node::add_next(uint8_t value) {
-	Node* next = new Node(value);
+Node* Node::add_next(uint8_t value, int index) {
+	Node* next = new Node(value, index);
 	std::vector<uint8_t> full_value = m_full_value;
 	full_value.push_back(value);
 	next->set_full_value(full_value);
@@ -140,31 +134,3 @@ NodeStruct Node::serialize()
 	return { m_index, m_fail->m_index, m_value, m_end, length, nexts };
 
 }
-
-/*int Node::Serialize(std::vector<NodeStruct> nodes_array)
-{
-	//std::vector<NodeStruct> nodes_array;
-	std::map<uint8_t, Node*>::iterator it;
-	if (m_end)
-	{
-		int* nexts = NULL;
-		nodes_array.push_back({ m_value, 0, m_end, m_index, nexts });
-		return nodes_array.size() - 1;
-	}
-	int* nexts = (int*)malloc(m_nexts.size() * sizeof(int));
-	int i = 0;
-	for (it = m_nexts.begin(); it != m_nexts.end(); it++)
-	{
-		nexts[i] = it->second->Serialize(nodes_array);
-		++i;
-	}
-	nodes_array.push_back({ m_value, 0, m_end, m_index, nexts });
-	return nodes_array.size() - 1;
-}*/
-
-//NodeStruct Node::Deserialize()
-//{
-//	int* nexts = (int*)malloc(m_nexts.size() * sizeof(int));
-//
-//	return { m_value, 0, m_end, m_index, nexts };
-//}

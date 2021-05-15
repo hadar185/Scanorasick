@@ -24,9 +24,7 @@ std::vector<uint8_t> File::read_file(bool readSpaces=true)
 	std::vector<uint8_t> bytes((std::istream_iterator<uint8_t>(file)),
 		std::istream_iterator<uint8_t>());
 
-	std::cout << "Read " << bytes.size() << " bytes" << std::endl;
-	/*for (std::vector<uint8_t>::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
-		std::cout << *i << ' ';*/
+	std::cout << "Read " << bytes.size() << " bytes from file" << std::endl;
 
 	return bytes;
 }
@@ -59,7 +57,3 @@ std::vector<uint8_t> File::get_content() {
 
 	return m_content;
 }
-
-TrieFile::TrieFile(std::string path) : File::File(path)
-{}
-

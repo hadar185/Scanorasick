@@ -1,13 +1,11 @@
 #include "Scanner.h"
 
-bool Scanner::scan(
-	std::vector<uint8_t> buffer,
-	Trie trie)
+int Scanner::scan(std::vector<uint8_t> buffer, Trie trie)
 {
-	int i = 0;
 	Node* root = trie.get_root();
 	Node* current = root;
 	Node* next = NULL;
+	int i = 0, found_count = 0;
 
 	while (i < buffer.size() && next != root)
 	{
@@ -33,47 +31,9 @@ bool Scanner::scan(
 		if (current->is_end())
 		{
 			current->print_full_value();
+			++found_count;
 		}
 	}
 
-	return true;
+	return found_count;
 }
-
-/*while (i < buffer.size() && next != root)
-	{
-		next = current->get_next(buffer[i]);
-
-		if (next == NULL)
-		{
-			if (current != root)
-			{
-				current = current->get_fail();
-				next = current->get_next(buffer[i]);
-
-				if (current == root && next == root)
-				{
-					++i;
-				}
-				else
-				{
-					if (current->is_end())
-					{
-						current->print_full_value();
-					}
-				}
-			}
-			else
-			{
-				++i;
-			}
-			continue;
-		}
-
-		current = next;
-		if (current->is_end())
-		{
-			current->print_full_value();
-		}
-
-		++i;
-	}*/

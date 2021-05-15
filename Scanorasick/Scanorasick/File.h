@@ -18,11 +18,3 @@ public:
 	std::vector<std::vector<uint8_t>> split_signatures(std::vector<uint8_t>);
 	std::vector<uint8_t> get_content();
 };
-
-/*class TrieFile : public File
-{
-public:
-	TrieFile(std::string);
-
-	std::vector<uint8_t> read_file(bool);
-};*/

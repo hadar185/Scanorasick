@@ -27,16 +27,14 @@ private:
 
 
 public:
-	static int count;
-
-	Node(uint8_t);
+	Node(uint8_t, int index);
 	Node(NodeStruct, Node *fail);
 
 	uint8_t get_value();
 
 	std::map<uint8_t, Node*> get_nexts();
 	Node* get_next(uint8_t);
-	Node* add_next(uint8_t);
+	Node* add_next(uint8_t, int);
 	Node* add_next(NodeStruct, Node *);
 
 	std::vector<uint8_t> get_full_value();
