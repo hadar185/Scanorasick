@@ -1,17 +1,29 @@
 #include "Node.h"
 
+// TO DO: Replace 'new' everywhere!
+
+Node::Node() :
+	m_value(0),
+	m_fail_link(NULL),
+	m_match(false),
+	m_index(0),
+	m_full_value()
+{}
+
 Node::Node(uint8_t value, int index) :
 	m_value(value),
-	m_fail(NULL),
-	m_end(false),
-	m_index(index)
+	m_fail_link(NULL),
+	m_match(false),
+	m_index(index),
+	m_full_value()
 {}
 
 Node::Node(NodeStruct node_struct, Node *fail) :
 	m_value(node_struct.value),
-	m_fail(fail),
-	m_end(node_struct.end),
-	m_index(node_struct.index)
+	m_fail_link(fail),
+	m_match(node_struct.end),
+	m_index(node_struct.index),
+	m_full_value()
 {}
 
 uint8_t Node::get_value()
@@ -19,14 +31,14 @@ uint8_t Node::get_value()
 	return m_value;
 }
 
-std::map<uint8_t, Node*> Node::get_nexts()
+std::map<uint8_t, Node *> Node::get_nexts()
 {
 	return m_nexts;
 }
 
 Node* Node::get_next(uint8_t value)
 {
-	std::map<uint8_t, Node*>::iterator it = m_nexts.find(value);
+	std::map<uint8_t, Node *>::iterator it = m_nexts.find(value);
 	if (it == m_nexts.end())
 	{
 		return NULL;
@@ -35,18 +47,20 @@ Node* Node::get_next(uint8_t value)
 }
 
 Node* Node::add_next(uint8_t value, int index) {
-	Node* next = new Node(value, index);
-	std::vector<uint8_t> full_value = m_full_value;
+	//auto next = std::make_unique<Node>(value, index);
+	Node *next = new Node(value, index);
+	Buffer full_value = m_full_value;
 	full_value.push_back(value);
 	next->set_full_value(full_value);
+	// TO DO: Maybe std::move?
 	m_nexts.insert({ value, next });
 
 	return m_nexts.at(value);
 }
 
 Node* Node::add_next(NodeStruct node_struct, Node *fail) {
-	Node* next = new Node(node_struct, fail);
-	std::vector<uint8_t> full_value = m_full_value;
+	Node* next = new Node(node_struct, fail); //std::make_unique<Node>(node_struct, fail);
+	Buffer full_value = m_full_value;
 	full_value.push_back(node_struct.value);
 	next->set_full_value(full_value);
 	m_nexts.insert({ node_struct.value, next });
@@ -54,34 +68,34 @@ Node* Node::add_next(NodeStruct node_struct, Node *fail) {
 	return m_nexts.at(node_struct.value);
 }
 
-std::vector<uint8_t> Node::get_full_value()
+Buffer Node::get_full_value()
 {
 	return m_full_value;
 }
 
-void Node::set_full_value(std::vector<uint8_t> value)
+void Node::set_full_value(Buffer value)
 {
 	m_full_value = value;
 }
 
-Node* Node::get_fail()
+Node* Node::get_fail_link()
 {
-	return m_fail;
+	return m_fail_link;
 }
 
-void Node::set_fail(Node* fail)
+void Node::set_fail_link(Node* fail)
 {
-	m_fail = fail;
+	m_fail_link = fail;
 }
 
-bool Node::is_end()
+bool Node::is_match()
 {
-	return m_end;
+	return m_match;
 }
 
-void Node::set_end(bool end)
+void Node::set_match(bool match)
 {
-	m_end = end;
+	m_match = match;
 }
 
 int Node::get_index()
@@ -91,31 +105,30 @@ int Node::get_index()
 
 void Node::print(int i)
 {
-	if (m_fail != NULL)
+	if (m_fail_link != NULL)
 	{
-		std::cout << "value: " << m_value << ", index: " << m_index << ", fail_index: " << m_fail->m_index << ", end: " << m_end << ", full: ";
+		std::cout << "value: " << m_value << ", index: " << m_index << ", fail_index: " << m_fail_link->m_index << ", match: " << m_match << ", full: ";
 		print_full_value();
 	}
 
-	std::map<uint8_t, Node*>::iterator it;
-	for (it = m_nexts.begin(); it != m_nexts.end(); it++)
+	for (const auto& [key, value] : m_nexts)
 	{
-		it->second->print(i + 1);
+		value->print(i + 1);
 	}
 }
 
 void Node::print_full_value()
 {
-	for (std::vector<uint8_t>::const_iterator i = m_full_value.begin(); i != m_full_value.end(); ++i)
+	for (Buffer::const_iterator it = m_full_value.begin(); it != m_full_value.end(); ++it)
 	{
-		std::cout << *i;
+		std::cout << *it;
 	}
 	std::cout << std::endl;
 }
 
 NodeStruct Node::serialize()
 {
-	int length = m_nexts.size();
+	int length = (int)m_nexts.size();
 	int* nexts = (int*)malloc(length * sizeof(int));
 	if (!nexts)
 	{
@@ -123,14 +136,13 @@ NodeStruct Node::serialize()
 		exit(1);
 	}
 
-	std::map<uint8_t, Node*>::iterator it;
 	int i = 0;
-	for (it = m_nexts.begin(); it != m_nexts.end(); it++)
+	for (const auto& [key, value] : m_nexts)
 	{
-		nexts[i] = it->second->m_index;
+		nexts[i] = value->m_index;
 		++i;
 	}
 
-	return { m_index, m_fail->m_index, m_value, m_end, length, nexts };
+	return { m_index, m_fail_link->m_index, m_value, m_match, length, nexts };
 
 }

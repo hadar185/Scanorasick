@@ -8,5 +8,5 @@
 class Scanner
 {
 public:
-	int scan(std::vector<uint8_t> buffer, Trie trie);
+	int scan(Buffer buffer, Trie trie, std::string = "");
 };

@@ -1,36 +1,49 @@
 #include "Scanner.h"
+#include "File.h"
 
-int Scanner::scan(std::vector<uint8_t> buffer, Trie trie)
+int Scanner::scan(Buffer buffer, Trie trie, std::string output_path)
 {
 	Node* root = trie.get_root();
 	Node* current = root;
 	Node* next = NULL;
-	int i = 0, found_count = 0;
+	int found_count = 0;
 
-	while (i < buffer.size() && next != root)
+	File output_file(output_path);
+
+	// Loop through every byte in the given buffer
+	for (int byte_index = 0; byte_index < buffer.size(); ++byte_index)
 	{
-		next = current->get_next(buffer[i]);
+		next = current->get_next(buffer[byte_index]);
 
 		if (next == NULL)
 		{
-			if (current == current->get_fail())
+			if (current == root)
 			{
-				++i;
 				continue;
 			}
 
-			current = current->get_fail();
-			next = current->get_next(buffer[i]);
+			// Go through the back link with the current byte
+			current = current->get_fail_link();
+
+			--byte_index;
+		}
+		else if (next == root)
+		{
+			break;
 		}
 		else
 		{
 			current = next;
-			++i;
 		}
 
-		if (current->is_end())
+		// Check if a match found
+		if (current->is_match())
 		{
 			current->print_full_value();
+			if (output_path != "")
+			{
+				output_file.write_to_file(current->get_full_value());
+			}
 			++found_count;
 		}
 	}

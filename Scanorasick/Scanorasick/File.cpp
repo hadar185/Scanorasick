@@ -6,7 +6,7 @@ File::File(std::string path) :
 	m_path(path)
 {}
 
-std::vector<uint8_t> File::read_file(bool readSpaces=true)
+Buffer File::read_file(bool readSpaces = true)
 {
 	std::ifstream file(m_path, std::ios::binary);
 
@@ -21,7 +21,7 @@ std::vector<uint8_t> File::read_file(bool readSpaces=true)
 		file.unsetf(std::ios::skipws);
 	}
 
-	std::vector<uint8_t> bytes((std::istream_iterator<uint8_t>(file)),
+	Buffer bytes((std::istream_iterator<uint8_t>(file)),
 		std::istream_iterator<uint8_t>());
 
 	std::cout << "Read " << bytes.size() << " bytes from file" << std::endl;
@@ -29,19 +29,26 @@ std::vector<uint8_t> File::read_file(bool readSpaces=true)
 	return bytes;
 }
 
-std::vector<std::vector<uint8_t>> File::split_signatures(std::vector<uint8_t> bytes)
+void File::write_to_file(Buffer content)
 {
-	std::vector<std::vector<uint8_t>> signatures = { {} };
+	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
+	for (const auto& e : content) file << e;
+	file << std::endl;
+	file.close();
+}
+
+std::vector<Buffer> File::split_signatures(Buffer bytes)
+{
+	std::vector<Buffer> signatures = { {} };
 	int index = 0;
 
-	for (std::vector<uint8_t>::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
+	for (Buffer::const_iterator i = bytes.begin(); i != bytes.end(); ++i)
 	{
 		if (*i == '\n') {
 			++index;
 			signatures.push_back({});
-			std::cout << "Line break found" << std::endl;
 		}
-		if (*i != '\r' && *i != '\n')
+		else if (*i != '\r')
 		{
 			signatures[index].push_back(*i);
 		}
@@ -49,7 +56,7 @@ std::vector<std::vector<uint8_t>> File::split_signatures(std::vector<uint8_t> by
 	return signatures;
 }
 
-std::vector<uint8_t> File::get_content() {
+Buffer File::get_content() {
 	if (m_content.size() == 0)
 	{
 		m_content = read_file();

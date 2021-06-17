@@ -9,29 +9,31 @@
 class Trie
 {
 private:
-	Node* m_root;
+	//std::shared_ptr<Node> m_root;
+	Node *m_root;
 	int m_size;
 	int m_patterns_amount;
 
-	void add_backs(Node*);
+	void add_back_links(Node*);
 
 public:
 	Trie();
+	~Trie() = default;
+	// Trie(const Trie&) = default;
 
 	Node* get_root();
 
 	int get_size();
-	void inc_size();
 
 	int get_patterns_amount();
 
-	void add_pattern(std::vector<uint8_t>);
-	void add_patterns(std::vector<std::vector<uint8_t>>);
-	Node* search(std::vector<uint8_t>);
-	void add_backs();
+	void add_pattern(Buffer);
+	void add_patterns(std::vector<Buffer>);
+	Node* search(Buffer);
+	void add_back_links();
 	void print();
 
-	NodeStruct *serialize();
+	std::unique_ptr<NodeStruct[]> serialize();
 	void deserialize(std::vector<NodeStruct>);
 };
 

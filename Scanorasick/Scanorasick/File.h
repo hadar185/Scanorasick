@@ -5,16 +5,19 @@
 #include <string>
 #include <vector>
 
+using Buffer = std::vector<uint8_t>;
+
 class File
 {
 private:
 	std::string m_path;
-	std::vector<uint8_t> m_content;
+	Buffer m_content;
 
 public:
 	File(std::string);
 
-	std::vector<uint8_t> read_file(bool);
-	std::vector<std::vector<uint8_t>> split_signatures(std::vector<uint8_t>);
-	std::vector<uint8_t> get_content();
+	Buffer read_file(bool);
+	void write_to_file(Buffer);
+	std::vector<Buffer> split_signatures(Buffer);
+	Buffer get_content();
 };

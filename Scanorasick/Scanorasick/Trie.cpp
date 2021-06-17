@@ -1,10 +1,17 @@
+#include <memory>
+
 #include "Trie.h"
 
-Trie::Trie() : m_patterns_amount(0)
+// TO DO: Change everywhere m_root to std::unique_ptr
+
+Trie::Trie() : m_patterns_amount(0), m_size(0)
 {
-	m_root = new Node(5, m_size);
-	inc_size();
-	m_root->set_fail(m_root);
+	//m_root = std::make_shared<Node>();
+	m_root = new Node();
+
+	// Increase amount of nodes in trie
+	++m_size;
+	m_root->set_fail_link(m_root);
 }
 
 Node* Trie::get_root()
@@ -17,45 +24,39 @@ int Trie::get_size()
 	return m_size;
 }
 
-void Trie::inc_size()
-{
-	++m_size;
-}
-
 int Trie::get_patterns_amount()
 {
 	return m_patterns_amount;
 }
 
-void Trie::add_pattern(std::vector<uint8_t> pattern)
+void Trie::add_pattern(Buffer pattern)
 {
 	Node* current = m_root;
-	while (pattern.size() > 0)
+	for (int i = 0; i < pattern.size(); ++i)
 	{
-		Node* next = current->get_next(pattern[0]);
+		Node* next = current->get_next(pattern[i]);
 		if (next != NULL)
 		{
 			current = next;
 		}
 		else
 		{
-			current = current->add_next(pattern[0], m_size);
-			inc_size();
-			current->set_fail(m_root);
+			current = current->add_next(pattern[i], m_size);
+			++m_size;
+			current->set_fail_link(m_root);
 		}
 
-		pattern.erase(pattern.begin());
-		if (pattern.size() == 0 && !current->is_end())
+		if (i == pattern.size()-1 && !current->is_match())
 		{
-			current->set_end(true);
+			current->set_match(true);
 			++m_patterns_amount;
 		}
 	}
 }
 
-void Trie::add_patterns(std::vector<std::vector<uint8_t>> patterns_array)
+void Trie::add_patterns(std::vector<Buffer> patterns_array)
 {
-	std::vector<std::vector<uint8_t>>::iterator it;
+	std::vector<Buffer>::iterator it;
 
 	for (it = patterns_array.begin(); it != patterns_array.end(); it++)
 	{
@@ -63,42 +64,47 @@ void Trie::add_patterns(std::vector<std::vector<uint8_t>> patterns_array)
 	}
 }
 
-Node* Trie::search(std::vector<uint8_t> pattern)
+Node* Trie::search(Buffer pattern)
 {
 	Node* current = m_root;
-	while (current != NULL && pattern.size() > 0)
+	for (int i = 0; i < pattern.size(); ++i)
 	{
-		current = current->get_next(pattern[0]);
-		pattern.erase(pattern.begin());
+		current = current->get_next(pattern[i]);
+		if (current == NULL)
+		{
+			break;
+		}
 	}
 	return current;
 }
 
-void Trie::add_backs()
+void Trie::add_back_links()
 {
-	add_backs(m_root);
+	add_back_links(m_root);
 }
 
-void Trie::add_backs(Node* node)
+void Trie::add_back_links(Node* node)
 {
-	std::vector<uint8_t> suffix = node->get_full_value();
+	Buffer suffix = node->get_full_value();
+	node->set_fail_link(m_root);
+
 	while (suffix.size() > 0)
 	{
+		// TO DO: Don't erase
 		suffix.erase(suffix.begin());
 		Node* target_fail = search(suffix);
 		if (target_fail != NULL)
 		{
-			node->set_fail(target_fail);
+			node->set_fail_link(target_fail);
 			break;
 		}
-		node->set_fail(m_root);
 	}
 
-	std::map<uint8_t, Node*> nexts = node->get_nexts();
-	std::map<uint8_t, Node*>::iterator it;
-	for (it = nexts.begin(); it != nexts.end(); it++)
+	//std::map<uint8_t, std::unique_ptr<Node>> nexts = std::move(node->get_nexts());
+	std::map<uint8_t, Node *> nexts = node->get_nexts();
+	for (const auto& [key, value] : nexts)
 	{
-		add_backs(it->second);
+		add_back_links(value);
 	}
 }
 
@@ -107,32 +113,35 @@ void Trie::print()
 	m_root->print(0);
 }
 
-NodeStruct *Trie::serialize()
+std::unique_ptr<NodeStruct[]> Trie::serialize()
 {
-	NodeStruct *nodes_array = (NodeStruct *)malloc(m_size * sizeof(NodeStruct));
+	// TO DO: Use managed pointers!
+	auto nodes_array = std::make_unique<NodeStruct[]>(m_size);
+	//NodeStruct *nodes_array = (NodeStruct *)malloc(m_size * sizeof(NodeStruct));
 	if (!nodes_array)
 	{
 		std::cout << "Memory Allocation Failed";
 		exit(1);
 	}
 
+	Node* current_node;
+
 	// Create a queue for BFS
 	std::list<Node*> queue;
-	Node* temp;
 	queue.push_back(m_root);
+
 	while (!queue.empty())
 	{
-		temp = queue.back();
-		queue.pop_back();
+		current_node = queue.front();
+		queue.pop_front();
 
-		std::cout << temp->get_value();
-		nodes_array[temp->get_index()] = temp->serialize();
+		//std::cout << current_node->get_value();
+		nodes_array[current_node->get_index()] = current_node->serialize();
 
-		std::map<uint8_t, Node*>::iterator it;
-		std::map<uint8_t, Node*> nexts = temp->get_nexts();
-		for (it = nexts.begin(); it != nexts.end(); it++)
+		std::map<uint8_t, Node *> nexts = current_node->get_nexts();
+		for (const auto& [key, value] : nexts)
 		{
-			queue.push_back(it->second);
+			queue.push_back(value);
 		}
 	}
 
@@ -141,6 +150,7 @@ NodeStruct *Trie::serialize()
 
 void Trie::deserialize(std::vector<NodeStruct> node_structs)
 {
+	// TO DO: Use managed pointers!
 	Node **nodes = (Node**)malloc(node_structs.size() * sizeof(Node *));
 	if (!nodes)
 	{
@@ -149,17 +159,21 @@ void Trie::deserialize(std::vector<NodeStruct> node_structs)
 	}
 
 	nodes[0] = m_root;
-	for (size_t i = 0; i < node_structs.size(); i++)
+	for (auto i = 0; i < node_structs.size(); i++)
 	{
-		for (size_t j = 0; j < node_structs[i].next_amount; j++)
+		for (auto j = 0; j < node_structs[i].next_amount; j++)
 		{
 			NodeStruct next = node_structs[node_structs[i].next_indexes[j]];
 			nodes[next.index] = nodes[i]->add_next(next, nodes[next.fail_index]);
-			inc_size();
+			++m_size;
 			if (next.end)
 			{
 				++m_patterns_amount;
 			}
 		}
+	}
+	for (auto i = 0; i < node_structs.size(); i++)
+	{
+		nodes[node_structs[i].index]->set_fail_link(nodes[node_structs[node_structs[i].index].fail_index]);
 	}
 }
