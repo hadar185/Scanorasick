@@ -33,6 +33,14 @@ void File::write_to_file(Buffer content)
 {
 	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
 	for (const auto& e : content) file << e;
+	//file << std::endl;
+	file.close();
+}
+
+void File::write_to_file(std::string content)
+{
+	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
+	file << content;
 	file << std::endl;
 	file.close();
 }

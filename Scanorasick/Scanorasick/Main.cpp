@@ -106,7 +106,7 @@ void scan(std::string scan_path, std::string dfa_path, std::string output_path =
 	//trie.print();
 
 	Scanner scanner;
-	std::cout << "Found " << scanner.scan(content, trie, output_path) << " signatures of " << trie.get_patterns_amount();
+	std::cout << "Found " << scanner.scan(content, trie, output_path) << " occurrences of " << trie.get_patterns_amount() << " signatures.";
 }
 
 void help()

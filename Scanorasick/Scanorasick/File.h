@@ -18,6 +18,7 @@ public:
 
 	Buffer read_file(bool);
 	void write_to_file(Buffer);
+	void write_to_file(std::string);
 	std::vector<Buffer> split_signatures(Buffer);
 	Buffer get_content();
 };
