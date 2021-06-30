@@ -1,7 +1,7 @@
 #include "Scanner.h"
 #include "File.h"
 
-int Scanner::scan(Buffer buffer, Trie trie, std::string output_path)
+int Scanner::scan(Buffer buffer, Trie& trie, std::string output_path)
 {
 	Node* root = trie.get_root();
 	Node* current = root;

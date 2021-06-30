@@ -31,41 +31,53 @@ uint8_t Node::get_value()
 	return m_value;
 }
 
-std::map<uint8_t, Node *> Node::get_nexts()
+std::vector<Node*> Node::get_next_values()
 {
-	return m_nexts;
+	std::vector<Node*> next_values(m_nexts.size());
+	for (const auto& [key, value] : m_nexts)
+	{
+		next_values.push_back(value.get());
+	}
+	return next_values;
 }
 
 Node* Node::get_next(uint8_t value)
 {
-	std::map<uint8_t, Node *>::iterator it = m_nexts.find(value);
+	NextMap::iterator it = m_nexts.find(value);
 	if (it == m_nexts.end())
 	{
 		return NULL;
 	}
-	return it->second;
+	return it->second.get();
 }
 
-Node* Node::add_next(uint8_t value, int index) {
-	//auto next = std::make_unique<Node>(value, index);
-	Node *next = new Node(value, index);
+Node* Node::add_next(uint8_t value, int index)
+{
+	// Create a node with the given value and index.
+	auto next = std::make_unique<Node>(value, index);
+
+	// Set the full value of the node starting from the root.
 	Buffer full_value = m_full_value;
 	full_value.push_back(value);
 	next->set_full_value(full_value);
-	// TO DO: Maybe std::move?
-	m_nexts.insert({ value, next });
 
-	return m_nexts.at(value);
+	// Set the node as one of the next nodes.
+	m_nexts.insert({ value, std::move(next) });
+
+	// Return a pointer to the new node.
+	return m_nexts.at(value).get();
 }
 
-Node* Node::add_next(NodeStruct node_struct, Node *fail) {
-	Node* next = new Node(node_struct, fail); //std::make_unique<Node>(node_struct, fail);
+Node* Node::add_next(NodeStruct node_struct, Node *fail)
+{
+	//Node* next = new Node(node_struct, fail); //std::make_unique<Node>(node_struct, fail);
+	auto next = std::make_unique<Node>(node_struct, fail);
 	Buffer full_value = m_full_value;
 	full_value.push_back(node_struct.value);
 	next->set_full_value(full_value);
-	m_nexts.insert({ node_struct.value, next });
+	m_nexts.insert({ node_struct.value, std::move(next) });
 
-	return m_nexts.at(node_struct.value);
+	return m_nexts.at(node_struct.value).get();
 }
 
 Buffer Node::get_full_value()

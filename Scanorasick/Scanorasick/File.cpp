@@ -6,7 +6,8 @@ File::File(std::string path) :
 	m_path(path)
 {}
 
-Buffer File::read_file(bool readSpaces = true)
+// CR: Remove parameter if not used
+Buffer File::read_file(bool read_spaces = true)
 {
 	std::ifstream file(m_path, std::ios::binary);
 
@@ -16,7 +17,7 @@ Buffer File::read_file(bool readSpaces = true)
 	}
 
 	// Leave new lines in binary mode
-	if (readSpaces)
+	if (read_spaces)
 	{
 		file.unsetf(std::ios::skipws);
 	}
@@ -32,6 +33,9 @@ Buffer File::read_file(bool readSpaces = true)
 void File::write_to_file(Buffer content)
 {
 	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
+
+	// CR: Write all at once or in chunks, content.data()
+
 	for (const auto& e : content) file << e;
 	//file << std::endl;
 	file.close();
@@ -39,13 +43,15 @@ void File::write_to_file(Buffer content)
 
 void File::write_to_file(std::string content)
 {
+	// CR: Merge the two write functions
+
 	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
 	file << content;
 	file << std::endl;
 	file.close();
 }
 
-std::vector<Buffer> File::split_signatures(Buffer bytes)
+std::vector<Buffer> File::split_signatures(Buffer& bytes)
 {
 	std::vector<Buffer> signatures = { {} };
 	int index = 0;

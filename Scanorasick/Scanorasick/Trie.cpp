@@ -4,19 +4,20 @@
 
 // TO DO: Change everywhere m_root to std::unique_ptr
 
-Trie::Trie() : m_patterns_amount(0), m_size(0)
+Trie::Trie() : m_patterns_amount(0), m_size(0), 
+			   m_root(std::make_unique<Node>())
 {
 	//m_root = std::make_shared<Node>();
-	m_root = new Node();
+	//m_root = new Node();
 
 	// Increase amount of nodes in trie
 	++m_size;
-	m_root->set_fail_link(m_root);
+	m_root->set_fail_link(m_root.get());
 }
 
 Node* Trie::get_root()
 {
-	return m_root;
+	return m_root.get();
 }
 
 int Trie::get_size()
@@ -31,22 +32,26 @@ int Trie::get_patterns_amount()
 
 void Trie::add_pattern(Buffer pattern)
 {
-	Node* current = m_root;
-	for (int i = 0; i < pattern.size(); ++i)
+	Node* current = m_root.get();
+	for (int pattern_index = 0; pattern_index < pattern.size(); ++pattern_index)
 	{
-		Node* next = current->get_next(pattern[i]);
+		// CR: Replace all NULL with nullptr
+		Node* next = current->get_next(pattern[pattern_index]);
 		if (next != NULL)
 		{
 			current = next;
 		}
 		else
 		{
-			current = current->add_next(pattern[i], m_size);
+			// CR: Private function for adding node to trie
+			// CR: Create the new node here and pass it to add_next
+			current = current->add_next(pattern[pattern_index], m_size);
 			++m_size;
-			current->set_fail_link(m_root);
+			current->set_fail_link(m_root.get());
 		}
 
-		if (i == pattern.size()-1 && !current->is_match())
+		if ((pattern_index == (pattern.size() - 1)) &&
+			(!current->is_match()))
 		{
 			current->set_match(true);
 			++m_patterns_amount;
@@ -66,7 +71,7 @@ void Trie::add_patterns(std::vector<Buffer> patterns_array)
 
 Node* Trie::search(Buffer pattern)
 {
-	Node* current = m_root;
+	Node* current = m_root.get();
 	for (int i = 0; i < pattern.size(); ++i)
 	{
 		current = current->get_next(pattern[i]);
@@ -80,13 +85,13 @@ Node* Trie::search(Buffer pattern)
 
 void Trie::add_back_links()
 {
-	add_back_links(m_root);
+	add_back_links(m_root.get());
 }
 
 void Trie::add_back_links(Node* node)
 {
 	Buffer suffix = node->get_full_value();
-	node->set_fail_link(m_root);
+	node->set_fail_link(m_root.get());
 
 	while (suffix.size() > 0)
 	{
@@ -101,8 +106,8 @@ void Trie::add_back_links(Node* node)
 	}
 
 	//std::map<uint8_t, std::unique_ptr<Node>> nexts = std::move(node->get_nexts());
-	std::map<uint8_t, Node *> nexts = node->get_nexts();
-	for (const auto& [key, value] : nexts)
+	auto next_values = node->get_next_values();
+	for (const auto value : next_values)
 	{
 		add_back_links(value);
 	}
@@ -116,32 +121,28 @@ void Trie::print()
 std::unique_ptr<NodeStruct[]> Trie::serialize()
 {
 	// TO DO: Use managed pointers!
+	// CR: Future features, serialize in chunks
 	auto nodes_array = std::make_unique<NodeStruct[]>(m_size);
 	//NodeStruct *nodes_array = (NodeStruct *)malloc(m_size * sizeof(NodeStruct));
-	if (!nodes_array)
-	{
-		std::cout << "Memory Allocation Failed";
-		exit(1);
-	}
 
 	Node* current_node;
 
 	// Create a queue for BFS
-	std::list<Node*> queue;
-	queue.push_back(m_root);
+	std::queue<Node*> queue;
+	queue.push(m_root.get());
 
 	while (!queue.empty())
 	{
 		current_node = queue.front();
-		queue.pop_front();
+		queue.pop();
 
 		//std::cout << current_node->get_value();
 		nodes_array[current_node->get_index()] = current_node->serialize();
 
-		std::map<uint8_t, Node *> nexts = current_node->get_nexts();
-		for (const auto& [key, value] : nexts)
+		auto next_values = current_node->get_next_values();
+		for (const auto value : next_values)
 		{
-			queue.push_back(value);
+			queue.push(value);
 		}
 	}
 
@@ -151,14 +152,10 @@ std::unique_ptr<NodeStruct[]> Trie::serialize()
 void Trie::deserialize(std::vector<NodeStruct> node_structs)
 {
 	// TO DO: Use managed pointers!
-	Node **nodes = (Node**)malloc(node_structs.size() * sizeof(Node *));
-	if (!nodes)
-	{
-		std::cout << "Memory Allocation Failed";
-		exit(1);
-	}
+	auto nodes = std::make_unique<Node*[]>(node_structs.size());
+	//Node **nodes = (Node**)malloc(node_structs.size() * sizeof(Node *));
 
-	nodes[0] = m_root;
+	nodes[0] = m_root.get();
 	for (auto i = 0; i < node_structs.size(); i++)
 	{
 		for (auto j = 0; j < node_structs[i].next_amount; j++)

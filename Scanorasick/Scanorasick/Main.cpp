@@ -9,8 +9,9 @@
 #include "File.h"
 #include "Scanner.h"
 
-enum class Commands : uint8_t
+enum class Commands
 {
+	INVALID_COMMAND = -1,
 	INIT = 0,
 	SCAN,
 	HELP
@@ -40,7 +41,7 @@ enum ScanArgIndex
 	SCAN_ARGS_COUNT
 };
 
-void write_dfa(Trie trie, std::string dfa_path)
+void write_dfa(Trie& trie, std::string& dfa_path)
 {
 	auto ns = trie.serialize();
 	std::ofstream file(dfa_path, std::ios::binary);
@@ -111,31 +112,35 @@ void scan(std::string scan_path, std::string dfa_path, std::string output_path =
 
 void help()
 {
-	std::cout << "-help" << std::endl;
-	std::cout << "-init [signatures_file_path] [dfa_file_path]" << std::endl;
-	std::cout << "-scan [file_to_scan_path] [dfa_file_path]" << std::endl;
+	std::cout << "--help" << std::endl;
+	std::cout << "--init [signatures_file_path] [dfa_file_path]" << std::endl;
+	std::cout << "--scan [file_to_scan_path] [dfa_file_path]" << std::endl;
 }
 
 Commands parse_args(std::string arg)
 {
 	//(std::string)argv[ArgIndex::COMMAND]
-	Commands cmd = (Commands)-1;
-	if (arg == "-init")
+	Commands cmd = Commands::INVALID_COMMAND;
+
+	if (arg == "--init")
 	{
 		cmd = Commands::INIT;
 	}
-	else if (arg == "-scan")
+	else if (arg == "--scan")
 	{
 		cmd = Commands::SCAN;
 	}
-	else if (arg == "-help") {
+	else if (arg == "--help") {
 		cmd = Commands::HELP;
 	}
+
 	return cmd;
 }
 
 void do_cmd(Commands cmd, int argc, char *argv[])
 {
+	// CR: No magic numbers
+
 	switch (cmd)
 	{
 	case Commands::INIT:
@@ -158,7 +163,7 @@ void do_cmd(Commands cmd, int argc, char *argv[])
 		break;
 
 	default:
-		std::cerr << "-help to get commands list" << std::endl;
+		std::cerr << "--help to get commands list" << std::endl;
 		break;
 	}
 }
@@ -167,10 +172,10 @@ int main(int argc, char* argv[])
 {
 	if (argc <= 1)
 	{
-		std::cerr << "-help to get commands list" << std::endl;
+		std::cerr << "--help to get commands list" << std::endl;
 		return 1;
 	}
-	Commands cmd = parse_args((std::string)argv[ArgIndex::COMMAND]);
+	Commands cmd = parse_args(argv[ArgIndex::COMMAND]);
 
 	do_cmd(cmd, argc, argv);
 

@@ -3,9 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 
-using Buffer = std::vector<uint8_t>;
+#include "Common.h"
 
 class File
 {
@@ -14,11 +13,13 @@ private:
 	Buffer m_content;
 
 public:
-	File(std::string);
+	File(std::string path);
 
+	// CR: Add names
+	// CR: Use references when possible
 	Buffer read_file(bool);
 	void write_to_file(Buffer);
 	void write_to_file(std::string);
-	std::vector<Buffer> split_signatures(Buffer);
+	std::vector<Buffer> split_signatures(Buffer&);
 	Buffer get_content();
 };

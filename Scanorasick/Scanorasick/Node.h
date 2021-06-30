@@ -2,10 +2,9 @@
 
 #include <iostream>
 #include <map>
-#include <vector>
 #include <list>
 
-using Buffer = std::vector<uint8_t>;
+#include "Common.h"
 
 #pragma pack(push, 1)
 struct NodeStruct
@@ -23,7 +22,7 @@ class Node
 {
 private:
 	uint8_t m_value;
-	std::map<uint8_t, Node *> m_nexts;
+	std::map<uint8_t, std::unique_ptr<Node>> m_nexts;
 	Buffer m_full_value;
 	Node* m_fail_link;
 	bool m_match;
@@ -37,10 +36,10 @@ public:
 
 	uint8_t get_value();
 
-	std::map<uint8_t, Node *> get_nexts();
+	std::vector<Node*> get_next_values();
 	Node* get_next(uint8_t);
 	Node* add_next(uint8_t, int);
-	Node* add_next(NodeStruct, Node *);
+	Node* add_next(NodeStruct, Node*);
 
 	Buffer get_full_value();
 	void set_full_value(Buffer);
@@ -59,3 +58,5 @@ public:
 	NodeStruct serialize();
 };
 
+using NodeUPtr = std::unique_ptr<Node>;
+using NextMap = std::map<uint8_t, NodeUPtr>;

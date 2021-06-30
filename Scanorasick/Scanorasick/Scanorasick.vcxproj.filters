@@ -4,20 +4,54 @@
     <Filter Include="Main">
       <UniqueIdentifier>{c1309a99-7cff-47a6-8117-538a08ad833d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File">
+      <UniqueIdentifier>{6d9d0546-4634-450d-b914-4e1164758d6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Node">
+      <UniqueIdentifier>{2853ad94-28eb-4cd7-8783-7b4e8b0880e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scanner">
+      <UniqueIdentifier>{002409f4-44cc-4013-885c-ca68a6ac4a7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Trie">
+      <UniqueIdentifier>{0b65f924-b642-4c8f-bd65-758196ca286d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{642a11dc-4cf2-4964-a253-a5d41de90669}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Trie.cpp" />
-    <ClCompile Include="Node.cpp" />
-    <ClCompile Include="Scanner.cpp" />
-    <ClCompile Include="File.cpp" />
+    <ClCompile Include="File.cpp">
+      <Filter>File</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Node</Filter>
+    </ClCompile>
+    <ClCompile Include="Scanner.cpp">
+      <Filter>Scanner</Filter>
+    </ClCompile>
+    <ClCompile Include="Trie.cpp">
+      <Filter>Trie</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Trie.h" />
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="Scanner.h" />
-    <ClInclude Include="File.h" />
+    <ClInclude Include="File.h">
+      <Filter>File</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Node</Filter>
+    </ClInclude>
+    <ClInclude Include="Scanner.h">
+      <Filter>Scanner</Filter>
+    </ClInclude>
+    <ClInclude Include="Trie.h">
+      <Filter>Trie</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
