@@ -17,9 +17,9 @@ public:
 
 	// CR: Add names
 	// CR: Use references when possible
-	Buffer read_file(bool);
-	void write_to_file(Buffer);
-	void write_to_file(std::string);
+	Buffer read_file();
+	//void write_to_file(Buffer);
+	void write_to_file(const uint8_t* content);
 	std::vector<Buffer> split_signatures(Buffer&);
 	Buffer get_content();
 };

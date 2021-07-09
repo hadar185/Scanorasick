@@ -39,12 +39,8 @@ int Scanner::scan(Buffer buffer, Trie& trie, std::string output_path)
 		// Check if a match found
 		if (current->is_match())
 		{
-			patterns_found.count(current->get_full_value()) > 0 ? patterns_found[current->get_full_value()]++ : patterns_found[current->get_full_value()] = 1;
-			//current->print_full_value();
-			//if (output_path != "")
-			//{
-			//	output_file.write_to_file(current->get_full_value());
-			//}
+			Buffer current_full_value = current->get_full_value();
+			patterns_found.count(current_full_value) > 0 ? patterns_found[current_full_value]++ : patterns_found[current_full_value] = 1;
 			++found_count;
 		}
 	}
@@ -59,12 +55,13 @@ void Scanner::show_output(std::map<Buffer, int> patterns_found, std::string outp
 	File output_file(output_path);
 	for (const auto& [key, value] : patterns_found)
 	{
-		for (const auto& e : key) std::cout << e;
-		std::cout << " " + std::to_string(value) + " times." << std::endl;
+		//for (const auto& e : key) std::cout << e;
+		std::cout << key.data() << " " + std::to_string(value) + " times." << std::endl;
 		if (output_path != "")
 		{
-			output_file.write_to_file(key);
-			output_file.write_to_file(" " + std::to_string(value) + " times.");
+			output_file.write_to_file(key.data());
+			std::string text = " " + std::to_string(value) + " times.\n";
+			output_file.write_to_file(reinterpret_cast<const uint8_t*>(&text[0]));
 		}
 	}
 }

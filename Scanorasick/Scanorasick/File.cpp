@@ -6,8 +6,7 @@ File::File(std::string path) :
 	m_path(path)
 {}
 
-// CR: Remove parameter if not used
-Buffer File::read_file(bool read_spaces = true)
+Buffer File::read_file()
 {
 	std::ifstream file(m_path, std::ios::binary);
 
@@ -17,10 +16,7 @@ Buffer File::read_file(bool read_spaces = true)
 	}
 
 	// Leave new lines in binary mode
-	if (read_spaces)
-	{
-		file.unsetf(std::ios::skipws);
-	}
+	file.unsetf(std::ios::skipws);
 
 	Buffer bytes((std::istream_iterator<uint8_t>(file)),
 		std::istream_iterator<uint8_t>());
@@ -30,24 +26,22 @@ Buffer File::read_file(bool read_spaces = true)
 	return bytes;
 }
 
-void File::write_to_file(Buffer content)
+/*void File::write_to_file(Buffer content)
 {
 	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
 
-	// CR: Write all at once or in chunks, content.data()
+	// TO DO: Write in chunks
 
-	for (const auto& e : content) file << e;
+	//for (const auto& e : content) file << e;
+	file << content.data();
 	//file << std::endl;
 	file.close();
-}
+}*/
 
-void File::write_to_file(std::string content)
+void File::write_to_file(const uint8_t* content)
 {
-	// CR: Merge the two write functions
-
 	std::ofstream file(m_path, std::ios_base::app | std::ios::binary);
 	file << content;
-	file << std::endl;
 	file.close();
 }
 

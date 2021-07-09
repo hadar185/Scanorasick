@@ -86,7 +86,7 @@ std::vector<NodeStruct> read_dfa(std::string dfa_path)
 void init(std::string signatures_path, std::string dfa_path)
 {
 	File signatures_file(signatures_path);
-	Buffer signatures_buffer = signatures_file.read_file(true);
+	Buffer signatures_buffer = signatures_file.read_file();
 	std::vector<Buffer> signatures_array = signatures_file.split_signatures(signatures_buffer);
 
 	Trie trie;
@@ -100,7 +100,7 @@ void init(std::string signatures_path, std::string dfa_path)
 void scan(std::string scan_path, std::string dfa_path, std::string output_path = "")
 {
 	File file_to_scan(scan_path);
-	Buffer content = file_to_scan.read_file(true);
+	Buffer content = file_to_scan.read_file();
 
 	Trie trie;
 	trie.deserialize(read_dfa(dfa_path));

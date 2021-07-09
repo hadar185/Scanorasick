@@ -33,7 +33,7 @@ uint8_t Node::get_value()
 
 std::vector<Node*> Node::get_next_values()
 {
-	std::vector<Node*> next_values(m_nexts.size());
+	std::vector<Node*> next_values;
 	for (const auto& [key, value] : m_nexts)
 	{
 		next_values.push_back(value.get());
