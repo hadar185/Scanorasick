@@ -14,6 +14,7 @@ struct NodeStruct
 	uint8_t value;
 	bool end;
 	int next_amount;
+	//std::unique_ptr<int[]> next_indexes;
 	int* next_indexes;
 };
 #pragma pack(pop)

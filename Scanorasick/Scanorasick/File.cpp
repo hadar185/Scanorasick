@@ -1,7 +1,5 @@
 #include "File.h"
 
-#include <iterator>
-
 File::File(std::string path) :
 	m_path(path)
 {}

@@ -139,19 +139,17 @@ Commands parse_args(std::string arg)
 
 void do_cmd(Commands cmd, int argc, char *argv[])
 {
-	// CR: No magic numbers
-
 	switch (cmd)
 	{
 	case Commands::INIT:
-		if (argc != 3)
+		if (argc != InitArgIndex::INIT_ARGS_COUNT-1)
 		{
 			init(argv[InitArgIndex::SIGNATURES_FILE], argv[InitArgIndex::DFA_PATH]);
 			break;
 		}
 
 	case Commands::SCAN:
-		if (argc >= 4 && argc <= 5)
+		if (argc >= ScanArgIndex::SCAN_ARGS_COUNT-1 && argc <= ScanArgIndex::SCAN_ARGS_COUNT)
 		{
 			std::string output_path = argc == ScanArgIndex::SCAN_ARGS_COUNT ? argv[ScanArgIndex::OUTPUT_FILE] : "";
 			scan(argv[ScanArgIndex::FILE_TO_SCAN], argv[ScanArgIndex::DFA_FILE], output_path);

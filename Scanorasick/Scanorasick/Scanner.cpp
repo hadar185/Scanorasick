@@ -5,7 +5,7 @@ int Scanner::scan(Buffer buffer, Trie& trie, std::string output_path)
 {
 	Node* root = trie.get_root();
 	Node* current = root;
-	Node* next = NULL;
+	Node* next = nullptr;
 	int found_count = 0;
 
 	std::map<Buffer, int> patterns_found;
@@ -15,7 +15,7 @@ int Scanner::scan(Buffer buffer, Trie& trie, std::string output_path)
 	{
 		next = current->get_next(buffer[byte_index]);
 
-		if (next == NULL)
+		if (next == nullptr)
 		{
 			if (current == root)
 			{

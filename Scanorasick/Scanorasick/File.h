@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iterator>
 
 #include "Common.h"
 
@@ -15,11 +16,10 @@ private:
 public:
 	File(std::string path);
 
-	// CR: Add names
 	// CR: Use references when possible
 	Buffer read_file();
 	//void write_to_file(Buffer);
 	void write_to_file(const uint8_t* content);
-	std::vector<Buffer> split_signatures(Buffer&);
+	std::vector<Buffer> split_signatures(Buffer& bytes);
 	Buffer get_content();
 };

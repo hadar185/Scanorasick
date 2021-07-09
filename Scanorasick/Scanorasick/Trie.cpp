@@ -2,14 +2,9 @@
 
 #include "Trie.h"
 
-// TO DO: Change everywhere m_root to std::unique_ptr
-
 Trie::Trie() : m_patterns_amount(0), m_size(0), 
 			   m_root(std::make_unique<Node>())
 {
-	//m_root = std::make_shared<Node>();
-	//m_root = new Node();
-
 	// Increase amount of nodes in trie
 	++m_size;
 	m_root->set_fail_link(m_root.get());
@@ -35,9 +30,8 @@ void Trie::add_pattern(Buffer pattern)
 	Node* current = m_root.get();
 	for (int pattern_index = 0; pattern_index < pattern.size(); ++pattern_index)
 	{
-		// CR: Replace all NULL with nullptr
 		Node* next = current->get_next(pattern[pattern_index]);
-		if (next != NULL)
+		if (next != nullptr)
 		{
 			current = next;
 		}
@@ -75,7 +69,7 @@ Node* Trie::search(Buffer pattern)
 	for (int i = 0; i < pattern.size(); ++i)
 	{
 		current = current->get_next(pattern[i]);
-		if (current == NULL)
+		if (current == nullptr)
 		{
 			break;
 		}
@@ -98,7 +92,7 @@ void Trie::add_back_links(Node* node)
 		// TO DO: Don't erase
 		suffix.erase(suffix.begin());
 		Node* target_fail = search(suffix);
-		if (target_fail != NULL)
+		if (target_fail != nullptr)
 		{
 			node->set_fail_link(target_fail);
 			break;
@@ -120,10 +114,8 @@ void Trie::print()
 
 std::unique_ptr<NodeStruct[]> Trie::serialize()
 {
-	// TO DO: Use managed pointers!
-	// CR: Future features, serialize in chunks
+	// TO DO: Future features, serialize in chunks
 	auto nodes_array = std::make_unique<NodeStruct[]>(m_size);
-	//NodeStruct *nodes_array = (NodeStruct *)malloc(m_size * sizeof(NodeStruct));
 
 	Node* current_node;
 
@@ -136,7 +128,6 @@ std::unique_ptr<NodeStruct[]> Trie::serialize()
 		current_node = queue.front();
 		queue.pop();
 
-		//std::cout << current_node->get_value();
 		nodes_array[current_node->get_index()] = current_node->serialize();
 
 		auto next_values = current_node->get_next_values();
@@ -151,9 +142,7 @@ std::unique_ptr<NodeStruct[]> Trie::serialize()
 
 void Trie::deserialize(std::vector<NodeStruct> node_structs)
 {
-	// TO DO: Use managed pointers!
 	auto nodes = std::make_unique<Node*[]>(node_structs.size());
-	//Node **nodes = (Node**)malloc(node_structs.size() * sizeof(Node *));
 
 	nodes[0] = m_root.get();
 	for (auto i = 0; i < node_structs.size(); i++)

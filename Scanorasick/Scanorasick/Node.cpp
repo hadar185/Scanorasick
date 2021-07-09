@@ -1,10 +1,8 @@
 #include "Node.h"
 
-// TO DO: Replace 'new' everywhere!
-
 Node::Node() :
 	m_value(0),
-	m_fail_link(NULL),
+	m_fail_link(nullptr),
 	m_match(false),
 	m_index(0),
 	m_full_value()
@@ -12,7 +10,7 @@ Node::Node() :
 
 Node::Node(uint8_t value, int index) :
 	m_value(value),
-	m_fail_link(NULL),
+	m_fail_link(nullptr),
 	m_match(false),
 	m_index(index),
 	m_full_value()
@@ -46,7 +44,7 @@ Node* Node::get_next(uint8_t value)
 	NextMap::iterator it = m_nexts.find(value);
 	if (it == m_nexts.end())
 	{
-		return NULL;
+		return nullptr;
 	}
 	return it->second.get();
 }
@@ -117,7 +115,7 @@ int Node::get_index()
 
 void Node::print(int i)
 {
-	if (m_fail_link != NULL)
+	if (m_fail_link != nullptr)
 	{
 		std::cout << "value: " << m_value << ", index: " << m_index << ", fail_index: " << m_fail_link->m_index << ", match: " << m_match << ", full: ";
 		print_full_value();
@@ -142,6 +140,7 @@ NodeStruct Node::serialize()
 {
 	int length = (int)m_nexts.size();
 	int* nexts = (int*)malloc(length * sizeof(int));
+	//auto nexts = std::make_unique<int[]>(length);
 	if (!nexts)
 	{
 		std::cout << "Memory Allocation Failed";
